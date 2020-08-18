@@ -1,8 +1,6 @@
 
-import 'dataLinkItem.dart';
-import 'dataLinkerAbs.dart';
-import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
+part of fig_database_linker;
+
 
 class DataLinkerSqlite extends DataLinkerAbs {
   DataLinkerSqlite(this.card) : super(card);

@@ -1,3 +1,6 @@
+part of fig_database_linker;
+
+
 class LinkSets{
   int id;
   String title,type,host,port,user,psw,db;

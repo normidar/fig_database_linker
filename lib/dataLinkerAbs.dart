@@ -1,6 +1,4 @@
-
-
-import 'dataLinkItem.dart';
+part of fig_database_linker;
 
 abstract class DataLinkerAbs {
   final LinkSets card;

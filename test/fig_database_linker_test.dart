@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:fig_database_linker/fig_database_linker.dart';
+import 'package:fig_database_linker/dataLinkerPostgres.dart';
 
 void main() {
   test('adds one to input values', () {

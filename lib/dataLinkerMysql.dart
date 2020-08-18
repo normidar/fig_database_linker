@@ -1,7 +1,4 @@
-
-import 'dataLinkItem.dart';
-import 'dataLinkerAbs.dart';
-import 'package:mysql1/mysql1.dart';
+part of fig_database_linker;
 
 class DataLinkerMysql extends DataLinkerAbs{
   LinkSets card;

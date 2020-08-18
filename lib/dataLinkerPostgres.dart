@@ -1,7 +1,6 @@
+part of fig_database_linker;
 
-import 'dataLinkItem.dart';
-import 'dataLinkerAbs.dart';
-import 'package:postgres/postgres.dart';
+
 
 class DataLinkerPostgres extends DataLinkerAbs{
   LinkSets card;
