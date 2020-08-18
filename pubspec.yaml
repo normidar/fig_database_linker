@@ -9,8 +9,8 @@ environment:
 
 # this package is used to link to database with one style,useful and easy,i hope you can like it.
 dependencies:
-  # flutter:
-  #   sdk: flutter
+  flutter:
+    sdk: flutter
   #数据库
   mysql1: ^0.17.1
   postgres: ^2.1.1 
@@ -18,8 +18,8 @@ dependencies:
   path: ^1.6.4
 
 dev_dependencies:
-  # flutter_test:
-  #   sdk: flutter
+  flutter_test:
+    sdk: flutter
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
