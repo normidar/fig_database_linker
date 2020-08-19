@@ -11,7 +11,7 @@ void main() {
     // expect(calculator.addOne(0), 1);
     // expect(() => calculator.addOne(null), throwsNoSuchMethodError);
   });
-  test('postgres test getFields',()async{
+  test('测试postgres的数据库连接',()async{
     LinkSets sets = LinkSets(
       'raja.db.elephantsql.com',
       '5432',

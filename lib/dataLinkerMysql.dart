@@ -5,6 +5,11 @@ class DataLinkerMysql extends DataLinkerAbs{
   DataLinkerMysql(this.card):super(card);
   MySqlConnection _conn;
   List<String> fields =[];
+  Map<String,String> typeStrs = {
+    'int':'INT',
+    'str':'VARCHAR',
+  };
+  //初始化
   Future getConn() async{
     var settings =ConnectionSettings(
       host: card.host,
@@ -15,7 +20,42 @@ class DataLinkerMysql extends DataLinkerAbs{
     );
     this._conn =await MySqlConnection.connect(settings);
   }
-  //获取数据库
+  //创建数据表
+  Future createTable(TableStru tableStru)async{
+    //未实现无符号
+    String start = 'CREATE TABLE IF NOT EXISTS `'+tableStru.tableName+'`(';
+    String body = tableStru.primaryKey + ' INT(11) UNSIGNED AUTO_INCREMENT,' ;
+    String uniques = '';
+
+    var types = tableStru.types;
+    for(var i in types.keys){
+      var value =types[i];
+      String line = ' `' + i + '` ';
+      line += typeStrs[types[i].typeStr];
+      line += '(' + value.length.toString() +')';
+      //当数字类型且无符号时加上无符号
+
+      if(value is FieldInt && !value.signed)line += ' UNSIGNED';
+      if(!types[i].nullAllow)line += ' NOT NULL';
+      if(types[i].defaultValue != null)line += ' DEFAULT \''+types[i].defaultValue + '\'' ;
+      if(types[i].unique)uniques+='`' +i+ '`,';
+
+      //此句最后
+      line += ',';
+      body += line;
+    }
+    //删掉尾部逗号
+    if(uniques!='')uniques=uniques.substring(0,uniques.length-1);
+    //主键
+    body += 'PRIMARY KEY (`'+tableStru.primaryKey+'`)';
+    //唯一
+    if(uniques!='') body += ',UNIQUE KEY `uid` (' +uniques+')';
+    String end = ')ENGINE=InnoDB DEFAULT CHARSET=utf8;';
+    //生成用于创建数据表的sql
+    var sql = start + body + end;
+    await _getRows(sql);
+  }
+  //获取数据表数据
   Future<List<String>> getTables()async{
     if(_conn != null && card.db != null){
       Results results = await _conn.query('SHOW TABLES');

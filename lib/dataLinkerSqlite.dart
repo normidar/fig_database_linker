@@ -8,6 +8,10 @@ class DataLinkerSqlite extends DataLinkerAbs {
   Database _conn;
   Map<String,String> _idFieldName = {};
   List<String> fields =[];
+  Map<String,String> typeStrs = {
+    'int':'INT',
+    'str':'VARCHAR',
+  };
   Future getConn() async {
     var path = join(await getDatabasesPath(),card.host + '.db');
     _conn =await openDatabase(
@@ -20,7 +24,29 @@ class DataLinkerSqlite extends DataLinkerAbs {
        version: 1
     );
   }
-
+  //创建数据表
+  Future createTable(TableStru tableStru)async{
+    String start = 'CREATE TABLE '+tableStru.tableName+'(';
+    String body = tableStru.primaryKey + ' INT PRIMARY KEY NOT NULL,';
+    var types = tableStru.types;
+    for(var i in types.keys){
+      var value =types[i];
+      String line = i +' ' + typeStrs[types[i].typeStr];
+      //属性
+      if(value is FieldInt && !value.signed)line += ' UNSIGNED';
+      if(!value.nullAllow)line += ' NOT NULL';
+      if(value.defaultValue != null)line += ' DEFAULT \''+value.defaultValue + '\'' ;
+      if(value.unique)line += ' UNIQUE';
+      
+      line += ',';
+      body += line;
+    }
+    //减去末尾逗号
+    body = body.substring(0,body.length-1);
+    String end = ');';
+    var sql = start +body +end;
+    await _getRows(sql);
+  }
   //获取数据库
   Future<List<String>> getTables() async {
     _conn.insert('dogs', 
