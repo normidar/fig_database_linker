@@ -7,7 +7,7 @@ class DataLinkerPostgres extends DataLinkerAbs{
   DataLinkerPostgres(this.card):super(card);
   PostgreSQLConnection _conn;
   List<String> fields =[];
-  Future getConn() async{
+  Future<String> getConn() async{
     _conn = PostgreSQLConnection(
       card.host,
       int.parse(card.port ?? 5432),
@@ -16,14 +16,7 @@ class DataLinkerPostgres extends DataLinkerAbs{
       password: card.psw,
     );
     await _conn.open();
-    // var settings =ConnectionSettings(
-    //   host: card.host,
-    //   port: int.parse(card.port ?? 3306),
-    //   user: card.user,
-    //   password: card.psw,
-    //   db: card.db
-    // );
-    // this._conn =await MySqlConnection.connect(settings);
+    return _conn.isClosed.toString();
   }
   //获取数据库
   Future<List<String>> getTables()async{
