@@ -7,6 +7,45 @@ class DataLinkerPostgres extends DataLinkerAbs{
   DataLinkerPostgres(this.card):super(card);
   PostgreSQLConnection _conn;
   List<String> fields =[];
+  Map<String,String> typeStrs = {
+    'int':'INT',
+    'str':'VARCHAR',
+  };
+  Future<String> createTable(TableStru tableStru,{bool ifNotExistsCreatMode = true})async{
+    var ifNotExistsStr = ifNotExistsCreatMode ? 'IF NOT EXISTS ' : '';
+    //postgres不支持无符号,但提供了实现
+    String start = 'CREATE TABLE '+ ifNotExistsStr +tableStru.tableName+' (';
+    String body ='\n  ' + tableStru.primaryKey + ' serial PRIMARY KEY,' ;
+
+    var types = tableStru.types;
+    for(var i in types.keys){
+      var value =types[i];
+      String line = '\n  ' + i + ' ';
+      line += typeStrs[types[i].typeStr];
+      //int 后不用加长度
+      if(!(types[i] is FieldInt))line += '(' + value.length.toString() +') ';
+      //当数字类型且无符号时加上无符号
+      if(value is FieldInt && !value.signed)line += ' CHECK(' +i+ '>=0)';
+      //唯一
+      if(value.unique)line += ' UNIQUE';
+      //非空
+      if(!types[i].nullAllow)line += ' NOT NULL';
+      //默认
+      if(types[i].defaultValue != null)line += ' DEFAULT \''+types[i].defaultValue + '\'' ;
+      //加末尾逗号
+      line += ',';
+      body += line;
+    }
+    //减去末尾逗号
+    body = body.substring(0,body.length-1);
+    String end = '\n);';
+    //生成用于创建数据表的sql
+    var sql = start + body + end;
+    await _getRows(
+      sql
+    );
+    return sql;
+  }
   Future<String> getConn() async{
     _conn = PostgreSQLConnection(
       card.host,

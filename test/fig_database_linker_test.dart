@@ -23,4 +23,20 @@ void main() {
     var g =await link.getConn();
     print(g);
   });
+  test('测试postgres数据库的创建表功能', ()async{
+    LinkSets sets = LinkSets(
+      'raja.db.elephantsql.com',
+      '5432',
+      'wabjtpfp',
+      'Q5q05nP9mcDUY9V3bWidtwegWxU9IO_J',
+      'wabjtpfp',
+    );
+    var link = DataLinkerPostgres(sets);
+    await link.getConn();
+    TableStru tableStru =TableStru('abh');
+    tableStru.addType('dogs', FieldInt(unique: true,signed:false));
+    tableStru.addType('nam', FieldStr(defaultValue: 'test',nullAllow: false,description: 'abcccc'));
+    print(await link.createTable(tableStru));
+
+  });
 }
