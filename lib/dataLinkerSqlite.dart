@@ -142,7 +142,7 @@ class DataLinkerSqlite extends DataLinkerAbs {
   }
 
   @override
-  Future deleteData(String table,String id)async {
+  Future deleteDataById(String table,String id)async {
     var s = await _conn.delete(table,where : await getIdName(table) + " = ?",whereArgs: [id]);
     return s;
   }

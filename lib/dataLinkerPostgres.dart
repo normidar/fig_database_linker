@@ -111,14 +111,9 @@ class DataLinkerPostgres extends DataLinkerAbs{
     return null;
   }
   //进行预览表的搜索
-  Future<List<List<String>>> getTableView(String table)async{
-    var results = await _conn.query("SHOW KEYS FROM $table WHERE Key_name = 'PRIMARY'");
-    try{
-      var primaryKey =results.first[4];//断点查看后发现在4,或许其它数据库会变
-      return await getRows("SELECT * FROM $table ORDER BY $primaryKey DESC LIMIT 20");
-    }catch(e){
-      return await getRows("SELECT * FROM $table order by 1 desc LIMIT 20");
-    }
+  Future<List<List<String>>> getTableView(String table,{int count = 20,bool desc = true})async{
+    var idName =await getIdName(table);
+    return await getRows("SELECT * FROM $table ORDER BY $idName DESC LIMIT "+ count.toString());
   }
   //一个辅助函数
   String _getAddDataSql(String table,Map data){
@@ -130,6 +125,7 @@ class DataLinkerPostgres extends DataLinkerAbs{
     var sql = "INSERT INTO " + table + ' ('+fields+') VALUES (' + values+')';
     return sql;
   }
+  ///实现
   @override
   Future<String> addDataToTable(String table,List<Map<String,dynamic>> data)async{
     var ts = '';
@@ -144,10 +140,13 @@ class DataLinkerPostgres extends DataLinkerAbs{
   Future closeDatabase() {
     return _conn.close();
   }
-
+  ///实现
   @override
-  Future deleteData(String table,String id) async{
-      // await this._conn.query("delete from $table where "+await getKey(table)+'=?',[id]);
+  Future<String> deleteDataById(String table,String id,{String idName = ''}) async{
+    if(idName.isEmpty)idName = await getIdName(table);
+    var sql = 'DELETE FROM $table WHERE ' + idName +'=' + id +';';
+    _getRows(sql);
+    return sql;
   }
 
   @override
@@ -191,5 +190,9 @@ class DataLinkerPostgres extends DataLinkerAbs{
     }else{
       return '0 id miss';
     }
+  }
+
+  Future deleteTable(String table)async{
+    _getRows('DROP TABLE ' + table + ';');
   }
 }

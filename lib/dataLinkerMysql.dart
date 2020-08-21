@@ -166,7 +166,7 @@ class DataLinkerMysql extends DataLinkerAbs{
   }
 
   @override
-  Future deleteData(String table,String id) async{
+  Future deleteDataById(String table,String id) async{
       await this._conn.query("delete from $table where "+await getIdName(table)+'=?',[id]);
   }
 

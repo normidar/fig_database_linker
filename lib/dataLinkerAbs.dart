@@ -37,7 +37,7 @@ abstract class DataLinkerAbs {
   //增
   Future addDataToTable(String table,List<Map<String,dynamic>> data);
   //删
-  Future deleteData(String table,String id);
+  Future deleteDataById(String table,String id);
   //改ata
   Future updataDataById(String table,Map<String,dynamic> data);
 }
