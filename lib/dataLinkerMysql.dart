@@ -167,11 +167,11 @@ class DataLinkerMysql extends DataLinkerAbs{
 
   @override
   Future deleteData(String table,String id) async{
-      await this._conn.query("delete from $table where "+await getKey(table)+'=?',[id]);
+      await this._conn.query("delete from $table where "+await getIdName(table)+'=?',[id]);
   }
 
   @override
-  Future<String> getKey(String table)async {
+  Future<String> getIdName(String table)async {
     var results = await _conn.query("SHOW KEYS FROM $table WHERE Key_name = 'PRIMARY'");
     try{
       var primaryKey =results.first[4];//断点查看后发现在4,或许其它数据库会变
@@ -181,8 +181,8 @@ class DataLinkerMysql extends DataLinkerAbs{
     }
   }
   @override
-  Future<int> updataData(String table, Map<String,dynamic> data)async {
-    var idName = await getKey(table);
+  Future<int> updataDataById(String table, Map<String,dynamic> data)async {
+    var idName = await getIdName(table);
     var setString = '';
     //循环合成SET的成员
     for(var k in data.keys){

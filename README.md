@@ -1,14 +1,16 @@
 # fig_database_linker
 
-A new Flutter package project.
+named FIG database objecter linker,suport:
+名为fig的数据库对象化连接工具,支持:
+- MySQL
+- SQLite
+- PostgreSQL
+
+
+同时支持数据类型:
+- int
+- string(varchat)
 
 ## Getting Started
 
-This project is a starting point for a Dart
-[package](https://flutter.dev/developing-packages/),
-a library module containing code that can be shared easily across
-multiple Flutter or Dart projects.
-
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.dev/docs), which offers tutorials, 
-samples, guidance on mobile development, and a full API reference.
+此

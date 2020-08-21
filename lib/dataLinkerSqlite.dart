@@ -143,12 +143,12 @@ class DataLinkerSqlite extends DataLinkerAbs {
 
   @override
   Future deleteData(String table,String id)async {
-    var s = await _conn.delete(table,where : await getKey(table) + " = ?",whereArgs: [id]);
+    var s = await _conn.delete(table,where : await getIdName(table) + " = ?",whereArgs: [id]);
     return s;
   }
   
   @override
-  Future<String> getKey(String table)async{
+  Future<String> getIdName(String table)async{
     //没有就去搜索
     if(_idFieldName[table] == null){
       try{
@@ -166,8 +166,8 @@ class DataLinkerSqlite extends DataLinkerAbs {
     return 'id';
   }
   @override
-  Future<int> updataData(String table, Map<String,dynamic> data)async {
-    var idName = await getKey(table);
+  Future<int> updataDataById(String table, Map<String,dynamic> data)async {
+    var idName = await getIdName(table);
     return _conn.update(table, data,where: idName + '= ?',whereArgs: [data[idName]]);
   }
 }

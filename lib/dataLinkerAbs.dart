@@ -31,13 +31,13 @@ abstract class DataLinkerAbs {
     }
   }
   //获取键
-  Future<String> getKey(String table);
+  Future<String> getIdName(String table);
   //关闭数据库
   Future closeDatabase();
   //增
-  Future<int> addDataToTable(String table,List dddata,{Function(bool) inputF,Function(int,int) overInput});
+  Future addDataToTable(String table,List<Map<String,dynamic>> data);
   //删
   Future deleteData(String table,String id);
   //改ata
-  Future<int> updataData(String table,Map<String,dynamic> data);
+  Future updataDataById(String table,Map<String,dynamic> data);
 }
