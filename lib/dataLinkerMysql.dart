@@ -18,7 +18,7 @@ class DataLinkerMysql extends DataLinkerAbs{
       password: card.psw,
       db: card.db
     );
-    this._conn =await MySqlConnection.connect(settings);
+    this._conn = await MySqlConnection.connect(settings);
   }
   //创建数据表
   Future createTable(TableStru tableStru)async{
@@ -73,11 +73,6 @@ class DataLinkerMysql extends DataLinkerAbs{
     if(_conn != null && card.db != null){
       Results results;
       results = await _conn.query(sql);
-      // .catchError(
-      //   (e){
-      //     //出现错误时的处理办法
-      //   }
-      // );
       return results;
     }else{
       return null;
@@ -87,8 +82,6 @@ class DataLinkerMysql extends DataLinkerAbs{
   Future<List<List<String>>> getRows(String sql)async{
     var results = await _getRows(sql);
     List<List<String>> rt = [];
-    fields = results.fields.map((v)=>v.name).toList();
-    rt.add(fields);
     if(results.isNotEmpty){
       for(var row in results){
         rt.add(row.values.toList().map((d)=>d.toString()).toList());//注意类型
@@ -98,66 +91,41 @@ class DataLinkerMysql extends DataLinkerAbs{
   }
   @override
   Future<List<String>> getFields({String sql='',String table = ''})async{
-    if(fields.isNotEmpty){
+    if(table.isNotEmpty){
+      sql = "SHOW COLUMNS FROM $table ";
+      var results = await _getRows(sql);
+      fields = results.map((v) => v.fields['Field'].toString()).toList();
       return fields;
-    }else{
-      if(sql.isNotEmpty){
-        var results = await _getRows(sql);
-        fields = results.fields.map((v)=>v.name).toList();
-        return fields;
-      }
+    }else if(sql.isNotEmpty){
+      var results = await _getRows(sql);
+      fields = results.fields.map((v)=>v.name).toList();
       return fields;
     }
   }
   //进行预览表的搜索
-  Future<List<List<String>>> getTableView(String table)async{
-    var results = await _conn.query("SHOW KEYS FROM $table WHERE Key_name = 'PRIMARY'");
-    try{
-      var primaryKey =results.first[4];//断点查看后发现在4,或许其它数据库会变
-      return await getRows("SELECT * FROM $table ORDER BY $primaryKey DESC LIMIT 20");
-    }catch(e){
-      return await getRows("SELECT * FROM $table order by 1 desc LIMIT 20");
-    }
+  Future<List<List<String>>> getTableView(String table,{int count =20,bool desc = true})async{
+    return await getRows("SELECT * FROM $table ORDER BY " + 
+      await getIdName(table) + (desc?' DESC':'') + " LIMIT " + 
+      count.toString());
   }
   //一个辅助函数
-  Future<int> _addData(String table,Map data)async{
-    try{
-      var fields = data.keys.join(',');
-      //在每个子值中加入引号
-      var valueList = data.values.map((e) => "'"+e+"'");
-      var values = valueList.join(',');
-      //组合SQL并运行
-      var sql = "INSERT INTO " + table + ' ('+fields+') VALUES (' + values+')';
-      var results = await _getRows(sql);
-      var rt = results.length;
-      return rt;
-    }catch(e){
-      throw e;
-    }
+  Future<String> _getAddDataSql(String table,Map data)async{
+    var fields = data.keys.join(',');
+    //在每个子值中加入引号
+    var valueList = data.values.map((e) => "'"+e+"'");
+    var values = valueList.join(',');
+    //组合SQL并运行
+    var sql = "INSERT INTO " + table + ' ('+fields+') VALUES (' + values+')';
+    return sql;
   }
   @override
-  Future<int> addDataToTable(String table,List dddata,{Function(bool) inputF,Function(int,int) overInput})async{
-    List<Map<String,dynamic>> data = dddata;
-    int ts = 0;
-    int fs = 0;
+  Future<String> addDataToTable(String table,List data)async{
+    var sql ='';
     for(var m in data){
-      var line = await _addData(table, m);
-      if(line > 0){
-        ts++;
-        if(inputF != null){
-          inputF(true);
-        }
-      }else{
-        fs++;
-        if(inputF != null){
-          inputF(false);
-        }
-      }
+      sql = await _getAddDataSql(table, m);
     }
-    if(overInput != null){
-      overInput(ts,fs);
-    }
-    return ts;
+    _getRows(sql);
+    return sql;
   }
   
   @override
@@ -173,12 +141,8 @@ class DataLinkerMysql extends DataLinkerAbs{
   @override
   Future<String> getIdName(String table)async {
     var results = await _conn.query("SHOW KEYS FROM $table WHERE Key_name = 'PRIMARY'");
-    try{
-      var primaryKey =results.first[4];//断点查看后发现在4,或许其它数据库会变
-      return primaryKey;
-    }catch(e){
-      return 'id';
-    }
+    var primaryKey =results.first.fields['Column_name'];//断点查看后发现在4,或许其它数据库会变
+    return primaryKey;
   }
   @override
   Future<int> updataDataById(String table, Map<String,dynamic> data)async {
@@ -205,5 +169,9 @@ class DataLinkerMysql extends DataLinkerAbs{
     }else{
       return 0;
     }
+  }
+  
+  Future deleteTable(String table)async{
+    _getRows('DROP TABLE ' + table + ';');
   }
 }

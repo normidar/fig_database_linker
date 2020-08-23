@@ -2,6 +2,8 @@
 
 library fig_database_linker;
 
+import 'dart:io';
+
 import 'package:mysql1/mysql1.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';

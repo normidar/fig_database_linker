@@ -137,14 +137,14 @@ class DataLinkerPostgres extends DataLinkerAbs{
   }
   
   @override
-  Future closeDatabase() {
-    return _conn.close();
+  Future closeDatabase()async{
+    if(!_conn.isClosed)await _conn.close();
   }
   ///实现
   @override
   Future<String> deleteDataById(String table,String id,{String idName = ''}) async{
     if(idName.isEmpty)idName = await getIdName(table);
-    var sql = 'DELETE FROM $table WHERE ' + idName +'=' + id +';';
+    var sql = 'DELETE FROM $table WHERE "' + idName +'" = ' + id +';';
     _getRows(sql);
     return sql;
   }
