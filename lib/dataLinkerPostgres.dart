@@ -113,7 +113,7 @@ class DataLinkerPostgres extends DataLinkerAbs{
   //进行预览表的搜索
   Future<List<List<String>>> getTableView(String table,{int count = 20,bool desc = true})async{
     var idName =await getIdName(table);
-    return await getRows("SELECT * FROM $table ORDER BY $idName DESC LIMIT "+ count.toString());
+    return await getRows("SELECT * FROM $table ORDER BY $idName"+(desc?' DESC':'')+" LIMIT "+ count.toString());
   }
   //一个辅助函数
   String _getAddDataSql(String table,Map data){

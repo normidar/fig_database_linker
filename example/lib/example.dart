@@ -2,11 +2,7 @@ import 'package:fig_database_linker/fig_database_linker.dart';
 
 main()async{
     LinkSets sets = LinkSets(
-      'host',
-      '5432(port)',
-      'username',
-      'password',
-      'database name',
+      
     );
     var link = DataLinkerPostgres(sets);
     await link.getConn();

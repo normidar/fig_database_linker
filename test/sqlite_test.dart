@@ -4,13 +4,9 @@ import 'package:fig_database_linker/fig_database_linker.dart';
 
 void main() async{
   LinkSets sets = LinkSets(
-    host:'normidar.ccjus2lp5urx.ap-northeast-1.rds.amazonaws.com',
-    port:'3306',
-    user:'normidar',
-    psw:'normidar',
-    db:'tmp',
+    host:'ccc',
   );
-  var link = DataLinkerMysql(sets)..getConn();
+  var link = DataLinkerSqlite(sets)..getConn();
   
   // test('测试数据库连接',()async{
   //   await link.getConn();
@@ -42,14 +38,14 @@ void main() async{
     print(await link.getIdName('ccc'));
   });
   test('表预览', ()async{
-    var str = (await link.getTableView('ccc',desc: true)).toString();
-    print(str);
+    // var str = (await link.getTableView('ccc',desc: true)).toString();
+    // print(str);
   });
   test('用id删除数据', ()async{
     print(await link.deleteDataById('ccc', '1'));
   });
   test('删除表', ()async{
-    await link.deleteTable('ccc');
+    // await link.deleteTable('ccc');
   });
   test('关闭连接', ()async{
     await link.closeDatabase();

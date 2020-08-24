@@ -101,6 +101,7 @@ class DataLinkerMysql extends DataLinkerAbs{
       fields = results.fields.map((v)=>v.name).toList();
       return fields;
     }
+    return null;
   }
   //进行预览表的搜索
   Future<List<List<String>>> getTableView(String table,{int count =20,bool desc = true})async{

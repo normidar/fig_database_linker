@@ -12,22 +12,18 @@ class DataLinkerSqlite extends DataLinkerAbs {
     'int':'INT',
     'str':'VARCHAR',
   };
+  ///host,
   Future getConn() async {
     var path = join(await getDatabasesPath(),card.host + '.db');
     _conn =await openDatabase(
       path,
-      onCreate: (db, version) {
-        return db.execute(
-          "CREATE TABLE dogs(id INTEGER PRIMARY KEY, name TEXT, age INTEGER)",
-        );
-      },
-       version: 1
+      version: 1
     );
   }
   //创建数据表
   Future createTable(TableStru tableStru)async{
     String start = 'CREATE TABLE '+tableStru.tableName+'(';
-    String body = tableStru.primaryKey + ' INT PRIMARY KEY NOT NULL,';
+    String body = tableStru.primaryKey + ' INTEGER PRIMARY KEY AUTOINCREMENT,';
     var types = tableStru.types;
     for(var i in types.keys){
       var value =types[i];
@@ -76,14 +72,8 @@ class DataLinkerSqlite extends DataLinkerAbs {
   //运行sql返回一张表
   Future<List<List<String>>> getRows(String sql) async {
     var results = await _getRows(sql);
-    var rt = results.map((v) {
-      var rt = v.values.map((v) {
-        return v.toString();
-      }).toList();
-      return rt;
-    }).toList();
-    fields =results.first.keys.toList();
-    rt.insert(0,fields );
+    var rt = results.map((v)=>v.values.map((v)
+      =>v.toString()).toList()).toList();
     return rt;
   }
   @override
@@ -100,8 +90,8 @@ class DataLinkerSqlite extends DataLinkerAbs {
     }
   }
   //进行预览表的搜索
-  Future<List<List<String>>> getTableView(String table) async {
-    return await getRows("SELECT * FROM $table order by 1 desc LIMIT 20");
+  Future<List<List<String>>> getTableView(String table,{int count = 20,bool desc = true}) async {
+    return await getRows("SELECT * FROM $table order by 1"+(desc?' DESC':'')+" LIMIT "+ count.toString());
   }
   Future<int> _addData(String table,Map data)async{
     try{
@@ -113,28 +103,11 @@ class DataLinkerSqlite extends DataLinkerAbs {
   }
   //增
   @override
-  Future<int> addDataToTable(String table,List dddata,{Function(bool) inputF,Function(int,int) overInput}) async{
-    List<Map<String,dynamic>> data = dddata;
-    int ts = 0;
-    int fs = 0;
+  Future<String> addDataToTable(String table,List<Map<String,dynamic>> data,) async{
     for(var m in data){
-      var line = await _addData(table, m);
-      if(line > 0){
-        ts++;
-        if(inputF != null){
-          inputF(true);
-        }
-      }else{
-        fs++;
-        if(inputF != null){
-          inputF(false);
-        }
-      }
+      await _addData(table, m);
     }
-    if(overInput != null){
-      overInput(ts,fs);
-    }
-    return ts;
+    return 'ts';
   }
   @override
   Future closeDatabase() {

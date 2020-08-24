@@ -4,11 +4,11 @@ import 'package:fig_database_linker/fig_database_linker.dart';
 
 void main() async{
   LinkSets sets = LinkSets(
-    'raja.db.elephantsql.com',
-    '5432',
-    'wabjtpfp',
-    'nQBIM1-c9WS-_Nh78l-nytTnyn_QIFZ7',
-    'wabjtpfp',
+    host:'raja.db.elephantsql.com',
+    port:'5432',
+    user:'wabjtpfp',
+    psw:'nQBIM1-c9WS-_Nh78l-nytTnyn_QIFZ7',
+    db:'wabjtpfp',
   );
   var link = DataLinkerPostgres(sets)..getConn();
   
