@@ -1,8 +1,4 @@
-
-
 library fig_database_linker;
-
-import 'dart:io';
 
 import 'package:mysql1/mysql1.dart';
 import 'package:path/path.dart';
@@ -19,4 +15,3 @@ part 'dataStructure/absField.dart';
 part 'dataStructure/intField.dart';
 part 'dataStructure/strField.dart';
 part 'dataStructure/tableStru.dart';
-

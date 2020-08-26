@@ -1,12 +1,13 @@
 part of fig_database_linker;
+
 ///用于表示
-abstract class FieldAbs{
+abstract class FieldAbs {
   String typeStr;
   String description;
   int length;
   bool nullAllow = true;
   bool unique = false;
-  Map<String,dynamic> toData(){
+  Map<String, dynamic> toData() {
     var rt = {};
     rt['name'] = typeStr;
     rt['description'] = description;
@@ -16,8 +17,9 @@ abstract class FieldAbs{
     rt['defaultValue'] = defaultValue;
     return rt;
   }
-  Map<String,dynamic> toWidgets() {
-    Map<String,dynamic> rt = {};
+
+  Map<String, dynamic> toWidgets() {
+    Map<String, dynamic> rt = {};
     rt['name'] = 'name';
     rt['length'] = 16;
     rt['nullAllow'] = true;
@@ -26,5 +28,6 @@ abstract class FieldAbs{
     rt['description'] = '';
     return rt;
   }
-  dynamic defaultValue ;
+
+  dynamic defaultValue;
 }

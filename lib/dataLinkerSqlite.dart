@@ -1,56 +1,51 @@
-
 part of fig_database_linker;
-
 
 class DataLinkerSqlite extends DataLinkerAbs {
   DataLinkerSqlite(this.card) : super(card);
   LinkSets card;
   Database _conn;
-  Map<String,String> _idFieldName = {};
-  List<String> fields =[];
-  Map<String,String> typeStrs = {
-    'int':'INT',
-    'str':'VARCHAR',
+  Map<String, String> typeStrs = {
+    'int': 'INT',
+    'str': 'VARCHAR',
   };
+
   ///host,
   Future getConn() async {
-    var path = join(await getDatabasesPath(),card.host + '.db');
-    _conn =await openDatabase(
-      path,
-      version: 1
-    );
+    var path = join(await getDatabasesPath(), card.host + '.db');
+    _conn = await openDatabase(path, version: 1);
   }
+
   //创建数据表
-  Future createTable(TableStru tableStru)async{
-    String start = 'CREATE TABLE '+tableStru.tableName+'(';
+  Future createTable(TableStru tableStru) async {
+    String start = 'CREATE TABLE ' + tableStru.tableName + '(';
     String body = tableStru.primaryKey + ' INTEGER PRIMARY KEY AUTOINCREMENT,';
     var types = tableStru.types;
-    for(var i in types.keys){
-      var value =types[i];
-      String line = i +' ' + typeStrs[types[i].typeStr];
+    for (var i in types.keys) {
+      var value = types[i];
+      String line = i + ' ' + typeStrs[types[i].typeStr];
       //属性
-      if(value is FieldInt && !value.signed)line += ' UNSIGNED';
-      if(!value.nullAllow)line += ' NOT NULL';
-      if(value.defaultValue != null)line += ' DEFAULT \''+value.defaultValue + '\'' ;
-      if(value.unique)line += ' UNIQUE';
-      
+      if (value is FieldInt && !value.signed) line += ' UNSIGNED';
+      if (!value.nullAllow) line += ' NOT NULL';
+      if (value.defaultValue != null)
+        line += ' DEFAULT \'' + value.defaultValue + '\'';
+      if (value.unique) line += ' UNIQUE';
+
       line += ',';
       body += line;
     }
     //减去末尾逗号
-    body = body.substring(0,body.length-1);
+    body = body.substring(0, body.length - 1);
     String end = ');';
-    var sql = start +body +end;
+    var sql = start + body + end;
     await _getRows(sql);
   }
+
   //获取数据库
   Future<List<String>> getTables() async {
-    _conn.insert('dogs', 
-          {
-            'name': 'name',
-            'age': '7',
-          }
-        );
+    _conn.insert('dogs', {
+      'name': 'name',
+      'age': '7',
+    });
     List<Map<String, dynamic>> result = await _conn.query(
       "sqlite_master",
       // where: 'type = ?',
@@ -69,78 +64,88 @@ class DataLinkerSqlite extends DataLinkerAbs {
     var results = await _conn.rawQuery(sql);
     return results;
   }
+
   //运行sql返回一张表
   Future<List<List<String>>> getRows(String sql) async {
     var results = await _getRows(sql);
-    var rt = results.map((v)=>v.values.map((v)
-      =>v.toString()).toList()).toList();
+    var rt =
+        results.map((v) => v.values.map((v) => v.toString()).toList()).toList();
     return rt;
   }
+
   @override
-  Future<List<String>> getFields({String sql='',String table = ''})async{
-    if(fields.isNotEmpty){
-      return fields;
-    }else{
-      if(sql.isNotEmpty){
-        var results = await _getRows(sql);
-        fields = results.first.keys.toList();
-        return fields;
-      }
-      return fields;
-    }
-  }
-  //进行预览表的搜索
-  Future<List<List<String>>> getTableView(String table,{int count = 20,bool desc = true}) async {
-    return await getRows("SELECT * FROM $table order by 1"+(desc?' DESC':'')+" LIMIT "+ count.toString());
-  }
-  Future<int> _addData(String table,Map data)async{
-    try{
-      var rt = await _conn.insert(table, data);
+  Future<List<String>> getFields({String sql = '', String table = ''}) async {
+    if (table.isNotEmpty) {
+      sql = 'PRAGMA  table_info($table)';
+      var results = await _getRows(sql);
+      var rt = results.map((row) => row['name'].toString()).toList();
       return rt;
-    }catch(e){
-      throw e;
+    } else if (sql.isNotEmpty) {
+      var results = await _getRows(sql);
+      if (results.length > 0) {
+        return results.first.keys.toList();
+      }
     }
+    return null;
   }
+
+  //进行预览表的搜索
+  Future<List<List<String>>> getTableView(String table,
+      {int count = 20, bool desc = true}) async {
+    return await getRows("SELECT * FROM $table order by 1" +
+        (desc ? ' DESC' : '') +
+        " LIMIT " +
+        count.toString());
+  }
+
+  Future<int> _addData(String table, Map data) async {
+    var rt = await _conn.insert(table, data);
+    return rt;
+  }
+
   //增
   @override
-  Future<String> addDataToTable(String table,List<Map<String,dynamic>> data,) async{
-    for(var m in data){
+  Future<String> addDataToTable(
+    String table,
+    List<Map<String, dynamic>> data,
+  ) async {
+    for (var m in data) {
       await _addData(table, m);
     }
     return 'ts';
   }
+
   @override
   Future closeDatabase() {
     return _conn.close();
   }
 
   @override
-  Future deleteDataById(String table,String id)async {
-    var s = await _conn.delete(table,where : await getIdName(table) + " = ?",whereArgs: [id]);
+  Future deleteDataById(String table, String id) async {
+    var s = await _conn
+        .delete(table, where: await getIdName(table) + " = ?", whereArgs: [id]);
     return s;
   }
-  
+
   @override
-  Future<String> getIdName(String table)async{
-    //没有就去搜索
-    if(_idFieldName[table] == null){
-      try{
-        var tableData = await _getRows("pragma table_info ('$table')");
-        for(var i in tableData){
-          if(i['pk'] == 1){
-            _idFieldName[table] =i['name'];
-            return _idFieldName[table];
-          }
-        }
-      }catch(e){
-        
+  Future<String> getIdName(String table) async {
+    var tableData = await _getRows("pragma table_info ('$table')");
+    for (var i in tableData) {
+      if (i['pk'] == 1) {
+        return i['name'];
       }
     }
-    return 'id';
+    return null;
   }
+
   @override
-  Future<int> updataDataById(String table, Map<String,dynamic> data)async {
+  Future<int> updataDataById(String table, Map<String, dynamic> data) async {
     var idName = await getIdName(table);
-    return _conn.update(table, data,where: idName + '= ?',whereArgs: [data[idName]]);
+    return _conn
+        .update(table, data, where: idName + '= ?', whereArgs: [data[idName]]);
+  }
+
+  Future deleteTable(String table) async {
+    _getRows('DROP TABLE ' + table + ';');
   }
 }
