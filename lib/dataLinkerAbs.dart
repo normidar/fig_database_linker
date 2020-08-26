@@ -4,16 +4,22 @@ abstract class DataLinkerAbs {
   final LinkSets card;
   DataLinkerAbs(this.card);
 
+  ///please run this first
   Future getConn();
-  //获取数据库
+
+  ///获取数据库
   Future<List<String>> getTables();
-  //运行sql返回一张表
+
+  ///运行sql返回一张表
   Future<List<List<String>>> getRows(String sql);
-  //获取所有的字段
+
+  ///获取所有的字段
   Future<List<String>> getFields({String sql = '', String table = ''});
-  //进行预览表的搜索
+
+  ///进行预览表的搜索
   Future<List<List<String>>> getTableView(String table);
-  //通过SQL截取表名
+
+  ///通过SQL截取表名
   String getTableName(String sql) {
     var lowerWrite = sql.toLowerCase();
     var index = lowerWrite.indexOf(' from ');
@@ -31,14 +37,21 @@ abstract class DataLinkerAbs {
     }
   }
 
-  //获取键
+  ///获取键
   Future<String> getIdName(String table);
-  //关闭数据库
+
+  ///关闭数据库
   Future closeDatabase();
-  //增
+
+  ///增
   Future addDataToTable(String table, List<Map<String, dynamic>> data);
-  //删
+
+  ///删
   Future deleteDataById(String table, String id);
-  //改ata
+
+  ///改ata
   Future updataDataById(String table, Map<String, dynamic> data);
+
+  ///删除表
+  Future deleteTable(String table);
 }
