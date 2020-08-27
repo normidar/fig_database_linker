@@ -1,15 +1,14 @@
 part of fig_database_linker;
 
-///整数型
-class FieldInt extends AbsNumberField {
-  FieldInt(
-      {this.length = 16,
-      this.description,
+///浮点数型,在sqlite上是32位
+class FieldFloat extends AbsNumberField{
+  FieldFloat(
+      {this.description,
       this.signed = true,
       this.nullAllow = true,
       this.unique = false,
       this.defaultValue});
-  String typeStr = 'int';
+  String typeStr = 'float';
   int length;
   String description;
   bool signed; //true为有符号

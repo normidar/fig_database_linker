@@ -1,7 +1,7 @@
 part of fig_database_linker;
 
 ///用于表示创建数据库时的数据类型
-abstract class FieldAbs {
+class FieldAbs {
   ///返回一个此类型的表示字符串
   String typeStr;
 
@@ -14,7 +14,7 @@ abstract class FieldAbs {
   ///是否允许空
   bool nullAllow = true;
 
-  ///默认类型
+  ///默认类型,未完整
   dynamic defaultValue;
 
   ///是否唯一
