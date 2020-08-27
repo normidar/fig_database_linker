@@ -1,7 +1,7 @@
 part of fig_database_linker;
 
 ///整数型
-class FieldInt extends AbsNumberField {
+class FieldInt extends AbsNumField {
   FieldInt(
       {this.length = 16,
       this.description,

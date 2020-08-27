@@ -24,7 +24,7 @@ class DataLinkerSqlite extends DataLinkerAbs {
       var value = types[i];
       String line = i + ' ' + typeStrs[types[i].typeStr];
       //属性
-      if (value is AbsNumberField && !value.signed) line += ' UNSIGNED';
+      if (value is AbsNumField && !value.signed) line += ' UNSIGNED';
       if (!value.nullAllow) line += ' NOT NULL';
       if (value.defaultValue != null)
         line += ' DEFAULT \'' + value.defaultValue + '\'';

@@ -12,8 +12,8 @@ part 'dataLinkerSqlite.dart';
 part 'dataLinkItem.dart';
 
 part 'dataStructure/absField.dart';
+part 'dataStructure/absNumField.dart';
 part 'dataStructure/intField.dart';
 part 'dataStructure/floatField.dart';
-part 'dataStructure/absNumberField.dart';
 part 'dataStructure/strField.dart';
 part 'dataStructure/tableStru.dart';

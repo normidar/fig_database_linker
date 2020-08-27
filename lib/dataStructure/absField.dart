@@ -1,7 +1,7 @@
 part of fig_database_linker;
 
 ///用于表示创建数据库时的数据类型
-class FieldAbs {
+abstract class FieldAbs {
   ///返回一个此类型的表示字符串
   String typeStr;
 

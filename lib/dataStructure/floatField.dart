@@ -1,7 +1,7 @@
 part of fig_database_linker;
 
 ///浮点数型,在sqlite上是32位
-class FieldFloat extends AbsNumberField{
+class FieldFloat extends AbsNumField{
   FieldFloat(
       {this.description,
       this.signed = true,
