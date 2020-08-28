@@ -8,9 +8,6 @@ void main() async{
   );
   var link = DataLinkerSqlite(sets,testMode: true);
   
-  // test('测试数据库连接',()async{
-  //   await link.getConn();
-  // });
   test('创建表', ()async{
     TableStru tableStru =TableStru('ccc');
     tableStru.primaryKey = 'id';

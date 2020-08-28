@@ -39,8 +39,8 @@ class DataLinkerSqlite extends DataLinkerAbs {
         line += ' DEFAULT \'' + value.defaultValue + '\'';
       if (value.unique) line += ' UNIQUE';
       //注释
-      if(index != count) line +=',';
-      if(value.description!=null)line +=' -- ' + value.description;
+      if (index != count) line += ',';
+      if (value.description != null) line += ' -- ' + value.description;
       line += '\n';
       //添加到主体
       body += line;
