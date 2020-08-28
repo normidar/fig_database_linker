@@ -24,7 +24,11 @@ class DataLinkerSqlite extends DataLinkerAbs {
     String body =
         tableStru.primaryKey + ' INTEGER PRIMARY KEY AUTOINCREMENT,\n';
     var types = tableStru.types;
+    //一个计数器,目的为让最后的行不加逗号
+    var index = 0;
+    var count = types.length;
     for (var i in types.keys) {
+      index++;
       var value = types[i];
       //类型名
       String line = i + ' ' + typeStrs[value.typeStr];
@@ -35,14 +39,13 @@ class DataLinkerSqlite extends DataLinkerAbs {
         line += ' DEFAULT \'' + value.defaultValue + '\'';
       if (value.unique) line += ' UNIQUE';
       //注释
-      line +=
-          ',' + (value.description==null ? value.description : '') + '\n';
+      if(index != count) line +=',';
+      if(value.description!=null)line +=' -- ' + value.description;
+      line += '\n';
       //添加到主体
       body += line;
     }
-    //减去末尾逗号
-    body = body.substring(0, body.length - 2);
-    String end = '\n);';
+    String end = ');';
     var sql = start + body + end;
     //测试模式
     if (testMode == false) await _getRows(sql);
