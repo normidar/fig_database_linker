@@ -25,7 +25,7 @@ class DataLinkerPostgres extends DataLinkerAbs {
       //int 后不用加长度
       if (!(types[i] is FieldInt)) line += '(' + value.length.toString() + ') ';
       //当数字类型且无符号时加上无符号
-      if (value is FieldInt && !value.signed) line += ' CHECK(' + i + '>=0)';
+      if (value is AbsNumField && !value.signed) line += ' CHECK(' + i + '>=0)';
       //唯一
       if (value.unique) line += ' UNIQUE';
       //非空

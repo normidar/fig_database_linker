@@ -21,28 +21,30 @@ class DataLinkerMysql extends DataLinkerAbs {
   }
 
   //创建数据表
-  Future createTable(TableStru tableStru) async {
-    //未实现无符号
-    String start = 'CREATE TABLE IF NOT EXISTS `' + tableStru.tableName + '`(';
-    String body = tableStru.primaryKey + ' INT(11) UNSIGNED AUTO_INCREMENT,';
+  Future<String> createTable(TableStru tableStru) async {
+    String start =
+        'CREATE TABLE IF NOT EXISTS `' + tableStru.tableName + '`(\n';
+    String body = tableStru.primaryKey + ' INT(11) UNSIGNED AUTO_INCREMENT,\n';
     String uniques = '';
-
+    //循环并插入
     var types = tableStru.types;
     for (var i in types.keys) {
       var value = types[i];
+      //字段名
       String line = ' `' + i + '` ';
-      line += typeStrs[types[i].typeStr];
+      //字段类型声明
+      line += typeStrs[value.typeStr];
+      //字段长度声明
       line += '(' + value.length.toString() + ')';
       //当数字类型且无符号时加上无符号
-
-      if (value is FieldInt && !value.signed) line += ' UNSIGNED';
-      if (!types[i].nullAllow) line += ' NOT NULL';
-      if (types[i].defaultValue != null)
-        line += ' DEFAULT \'' + types[i].defaultValue + '\'';
-      if (types[i].unique) uniques += '`' + i + '`,';
-
+      if (value is AbsNumField && !value.signed) line += ' UNSIGNED';
+      //检测是否允许空
+      if (!value.nullAllow) line += ' NOT NULL';
+      if (value.defaultValue != null)
+        line += ' DEFAULT \'' + value.defaultValue + '\'';
+      if (value.unique) uniques += '`' + i + '`,';
       //此句最后
-      line += ',';
+      line += ',\n';
       body += line;
     }
     //删掉尾部逗号
@@ -55,9 +57,10 @@ class DataLinkerMysql extends DataLinkerAbs {
     //生成用于创建数据表的sql
     var sql = start + body + end;
     await _getRows(sql);
+    return sql;
   }
 
-  //获取数据表数据
+  ///获取数据表数据
   Future<List<String>> getTables() async {
     if (_conn != null && card.db != null) {
       Results results = await _conn.query('SHOW TABLES');
@@ -71,7 +74,7 @@ class DataLinkerMysql extends DataLinkerAbs {
     }
   }
 
-  //运行sql并返回处理工具
+  ///运行sql并返回处理工具
   Future<Results> _getRows(String sql) async {
     if (_conn != null && card.db != null) {
       Results results;
@@ -82,7 +85,7 @@ class DataLinkerMysql extends DataLinkerAbs {
     }
   }
 
-  //运行sql返回一张表
+  ///运行sql返回一张表
   Future<List<List<String>>> getRows(String sql) async {
     var results = await _getRows(sql);
     List<List<String>> rt = [];
@@ -109,7 +112,7 @@ class DataLinkerMysql extends DataLinkerAbs {
     return null;
   }
 
-  //进行预览表的搜索
+  ///进行预览表的搜索
   Future<List<List<String>>> getTableView(String table,
       {int count = 20, bool desc = true}) async {
     return await getRows("SELECT * FROM $table ORDER BY " +
@@ -119,7 +122,7 @@ class DataLinkerMysql extends DataLinkerAbs {
         count.toString());
   }
 
-  //一个辅助函数
+  ///一个辅助函数
   Future<String> _getAddDataSql(String table, Map data) async {
     var fields = data.keys.join(',');
     //在每个子值中加入引号

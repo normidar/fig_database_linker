@@ -16,4 +16,5 @@ part 'dataStructure/absNumField.dart';
 part 'dataStructure/intField.dart';
 part 'dataStructure/floatField.dart';
 part 'dataStructure/strField.dart';
+part 'dataStructure/dateField.dart';
 part 'dataStructure/tableStru.dart';

@@ -6,7 +6,7 @@ void main() async{
   LinkSets sets = LinkSets(
     host:'ccc',
   );
-  var link = DataLinkerSqlite(sets)..getConn();
+  var link = DataLinkerSqlite(sets,testMode: true);
   
   // test('测试数据库连接',()async{
   //   await link.getConn();

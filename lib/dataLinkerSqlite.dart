@@ -1,12 +1,15 @@
 part of fig_database_linker;
 
 class DataLinkerSqlite extends DataLinkerAbs {
-  DataLinkerSqlite(this.card) : super(card);
+  DataLinkerSqlite(this.card, {this.testMode = false}) : super(card);
+  bool testMode;
   LinkSets card;
   Database _conn;
   Map<String, String> typeStrs = {
-    'int': 'INT',
-    'str': 'VARCHAR',
+    'int': 'INTEGER',
+    'str': 'TEXT',
+    'float': 'REAL',
+    'date': 'TEXT',
   };
 
   ///host,
@@ -16,28 +19,34 @@ class DataLinkerSqlite extends DataLinkerAbs {
   }
 
   //创建数据表
-  Future createTable(TableStru tableStru) async {
-    String start = 'CREATE TABLE ' + tableStru.tableName + '(';
-    String body = tableStru.primaryKey + ' INTEGER PRIMARY KEY AUTOINCREMENT,';
+  Future<String> createTable(TableStru tableStru) async {
+    String start = 'CREATE TABLE ' + tableStru.tableName + '(\n';
+    String body =
+        tableStru.primaryKey + ' INTEGER PRIMARY KEY AUTOINCREMENT,\n';
     var types = tableStru.types;
     for (var i in types.keys) {
       var value = types[i];
-      String line = i + ' ' + typeStrs[types[i].typeStr];
-      //属性
-      if (value is AbsNumField && !value.signed) line += ' UNSIGNED';
+      //类型名
+      String line = i + ' ' + typeStrs[value.typeStr];
+      //
+      if (value is AbsNumField && !value.signed) line += ' CHECK($i >= 0)';
       if (!value.nullAllow) line += ' NOT NULL';
       if (value.defaultValue != null)
         line += ' DEFAULT \'' + value.defaultValue + '\'';
       if (value.unique) line += ' UNIQUE';
-
-      line += ',';
+      //注释
+      line +=
+          ',' + (value.description==null ? value.description : '') + '\n';
+      //添加到主体
       body += line;
     }
     //减去末尾逗号
-    body = body.substring(0, body.length - 1);
-    String end = ');';
+    body = body.substring(0, body.length - 2);
+    String end = '\n);';
     var sql = start + body + end;
-    await _getRows(sql);
+    //测试模式
+    if (testMode == false) await _getRows(sql);
+    return sql;
   }
 
   //获取数据库
