@@ -10,6 +10,7 @@ class DataLinkerSqlite extends DataLinkerAbs {
     'str': 'TEXT',
     'float': 'REAL',
     'date': 'TEXT',
+    'decimal': 'NUMERIC',
   };
 
   ///host,

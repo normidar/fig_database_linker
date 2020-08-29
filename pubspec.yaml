@@ -1,6 +1,6 @@
 name: fig_database_linker
 description: This package is used to link to database with one style,useful and easy.I hope you can like it.
-version: 0.2.23
+version: 0.2.25
 homepage: https://normidar.com
 
 environment:

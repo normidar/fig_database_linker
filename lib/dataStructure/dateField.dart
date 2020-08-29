@@ -1,6 +1,6 @@
 part of fig_database_linker;
 
-///字符串型
+///日期型,TEXT: "YYYY-MM-DD HH:MM:SS.SSS"
 class FieldDate extends FieldAbs {
   FieldDate(
       {this.description,
@@ -11,5 +11,6 @@ class FieldDate extends FieldAbs {
   String description;
   bool nullAllow;
   bool unique;
+  bool isDefaultValueWithNow = false;
   dynamic defaultValue;
 }

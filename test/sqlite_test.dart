@@ -10,7 +10,6 @@ void main() async{
   
   test('创建表', ()async{
     TableStru tableStru =TableStru('ccc');
-    tableStru.primaryKey = 'id';
     tableStru.addType('dogs', FieldInt(signed:false));
     tableStru.addType('nam', FieldStr(defaultValue: 'test',nullAllow: false,description: 'abcccc'));
     print(await link.createTable(tableStru));
