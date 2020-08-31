@@ -1,10 +1,14 @@
 part of fig_database_linker;
 
 class DataLinkerSqlite extends DataLinkerAbs {
+  /// card just only need host as path to link sqlite.
   DataLinkerSqlite(this.card, {this.testMode = false}) : super(card);
   bool testMode;
   LinkSets card;
   Database _conn;
+
+  ///主要用的是key来进行
+  Map<String, bool> allTables;
   Map<String, String> typeStrs = {
     'int': 'INTEGER',
     'str': 'TEXT',
@@ -14,14 +18,26 @@ class DataLinkerSqlite extends DataLinkerAbs {
   };
 
   ///host,
-  Future getConn() async {
+  Future getConn({bool setTableList = true}) async {
     var path = join(await getDatabasesPath(), card.host + '.db');
     _conn = await openDatabase(path, version: 1);
+    //设置一个所有表的列表
+    if (setTableList) {
+      allTables = {};
+      var results = await _getRows('select name fromsqlite_master;');
+      for (var i in results) {
+        allTables[i['name']] = true;
+      }
+    }
   }
 
   //创建数据表
-  Future<String> createTable(TableStru tableStru) async {
-    String start = 'CREATE TABLE ' + tableStru.tableName + '(\n';
+  Future<String> createTable(TableStru tableStru,
+      {bool ifNotExistsCreatMode = true}) async {
+    //是否选择表安全创建
+    var ifNotExistsStr = ifNotExistsCreatMode ? 'IF NOT EXISTS ' : '';
+    String start =
+        'CREATE TABLE ' + ifNotExistsStr + tableStru.tableName + '(\n';
     String body =
         tableStru.primaryKey + ' INTEGER PRIMARY KEY AUTOINCREMENT,\n';
     var types = tableStru.types;
