@@ -167,10 +167,44 @@ class DataLinkerSqlite extends DataLinkerAbs {
     return null;
   }
 
+  ///会查找并返回,
+  ///当输入updateData的时候会对查找结果进行更新,
+  ///更新时,返回情况依数据库而异请不要依赖.
+  ///如果设置两个add的话将会执行增加的操作,此也不返回.
+  Future<List<List<String>>> where(String table, String field, String value,
+      {Map<String, dynamic> updateData,
+      String addField,
+      double addValue}) async {
+    //当更新数据为空,则仅仅查找
+    if (updateData != null) {
+      await _conn
+          .update(table, updateData, where: field + ' = ?', whereArgs: [value]);
+      return null;
+    } else if (addField != null && addValue != null) {
+      var sql = "UPDATE " +
+          table +
+          " SET " +
+          addField +
+          '=' +
+          addField +
+          '+' +
+          addValue.toString() +
+          ' WHERE ' +
+          field +
+          " = '" +
+          value +
+          "'";
+        return await getRows(sql);
+    } else {
+      return await getRows(
+          "SELECT * FROM " + table + " WHERE " + field + " = '" + value + "'");
+    }
+  }
+
   @override
   Future<int> updataDataById(String table, Map<String, dynamic> data) async {
     var idName = await getIdName(table);
-    return _conn
+    return await _conn
         .update(table, data, where: idName + '= ?', whereArgs: [data[idName]]);
   }
 
