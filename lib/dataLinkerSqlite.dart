@@ -194,7 +194,7 @@ class DataLinkerSqlite extends DataLinkerAbs {
           " = '" +
           value +
           "'";
-        return await getRows(sql);
+      return await getRows(sql);
     } else {
       return await getRows(
           "SELECT * FROM " + table + " WHERE " + field + " = '" + value + "'");
